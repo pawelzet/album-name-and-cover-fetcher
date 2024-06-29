@@ -13,5 +13,5 @@ How to use?
 
 
 How to find not updated tracks or tracks without Album Name?|
-1. Download find_album_empty_art.py and you are going to get the list of files without any Album Name
+1. Download find_album_empty_art.sh and you are going to get the list of files without any Album Name
 2. To check songs with specific album name you can modify the script by changing check_album() function
