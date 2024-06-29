@@ -6,7 +6,7 @@ from requests.auth import HTTPBasicAuth
 
 # Spotify API credentials to change by user
 SPOTIFY_CLIENT_ID = 'SPOTIFY_CLIENT_ID'
-SPOTIFY_CLIENT_SECRET = '<SPOTIFY_CLIENT_SECRET'
+SPOTIFY_CLIENT_SECRET = 'SPOTIFY_CLIENT_SECRET'
 
 def get_spotify_access_token(client_id, client_secret):
     url = "https://accounts.spotify.com/api/token"
@@ -47,8 +47,8 @@ def get_album_info_from_spotify(access_token, artist, title):
         print(f"Found album: {album_title} with ID: {album_id} for artist: {artist} and title: {title}")
         return album_title, album_id
     else:
-        print(f"No suitable album found for artist: {artist} and title: {title}. Setting album to 'Single'.")
-        return "Single", None
+        print(f"No suitable album found for artist: {artist} and title: {title}. Album name will not be changed.")
+        return None, None
 
 def get_cover_art_from_spotify(access_token, album_id):
     if not album_id:
@@ -93,9 +93,9 @@ def update_file_metadata(file_path, access_token):
     
     album_title, album_id = get_album_info_from_spotify(access_token, artist, title)
     
-    # Update album title and cover art
-    audio.delall('TALB')
-    audio.add(TALB(encoding=3, text=album_title))
+    if album_title:
+        audio.delall('TALB')
+        audio.add(TALB(encoding=3, text=album_title))
     
     cover_art_data = get_cover_art_from_spotify(access_token, album_id)
     if cover_art_data:
@@ -108,7 +108,7 @@ def update_file_metadata(file_path, access_token):
         ))
     
     audio.save(file_path)
-    print(f"Updated file: {file_path} with album: {album_title}")
+    print(f"Updated file: {file_path} with album: {album_title if album_title else 'No change'}")
 
 def process_folder(folder_path, access_token):
     for root, _, files in os.walk(folder_path):
@@ -118,10 +118,11 @@ def process_folder(folder_path, access_token):
                 update_file_metadata(file_path, access_token)
 
 if __name__ == "__main__":
-    # Path to change by user
-    folder_path = "/path/to/your/music/files"
+    #To be changed by user
+    folder_path = "/path/to/your/folder/with/music"
     access_token = get_spotify_access_token(SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET)
     if access_token:
         process_folder(folder_path, access_token)
     else:
         print("Failed to obtain access token. Exiting.")
+
